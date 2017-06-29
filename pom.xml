@@ -11,6 +11,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>fx</module>
     </modules>
 
     <properties>
