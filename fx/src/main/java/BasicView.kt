@@ -1,3 +1,4 @@
+import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.Pane
@@ -31,6 +32,19 @@ class BasicController : Controller() {
     fun doThing() {
         println("blah")
     }
+}
+
+class BasicModel(name: String? = null) {
+    val nameProperty = SimpleStringProperty(this, "name", name)
+    var name by nameProperty
+}
+
+class Person(name: String? = null, title: String? = null) {
+    val nameProperty = SimpleStringProperty(this, "name", name)
+    var name by nameProperty
+
+    val titleProperty = SimpleStringProperty(this, "title", title)
+    var title by titleProperty
 }
 
 class TopView(override val root: Pane = StackPane()) : View() {
