@@ -10,6 +10,7 @@ import tornadofx.action
 import tornadofx.borderpane
 import tornadofx.button
 import tornadofx.plusAssign
+import kotlin.reflect.KProperty
 
 class BasicView : View() {
 
@@ -45,6 +46,14 @@ class Person(name: String? = null, title: String? = null) {
 
     val titleProperty = SimpleStringProperty(this, "title", title)
     var title by titleProperty
+}
+
+private operator fun <T> SimpleStringProperty.setValue(t: T, property: KProperty<*>, any: Any) {
+    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+}
+
+private operator fun <T> SimpleStringProperty.getValue(t: T, property: KProperty<*>): Any {
+    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 }
 
 class TopView(override val root: Pane = StackPane()) : View() {
