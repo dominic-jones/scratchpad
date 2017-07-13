@@ -1,21 +1,17 @@
+import com.github.thomasnield.rxkotlinfx.actionEvents
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
-import tornadofx.Controller
-import tornadofx.View
-import tornadofx.action
-import tornadofx.borderpane
-import tornadofx.button
-import tornadofx.getValue
-import tornadofx.plusAssign
-import tornadofx.setValue
+import tornadofx.*
 
 class BasicView : View() {
 
     val controller: BasicController by inject()
+    val person = Person("Tulip", "Mr")
+    val model = PersonModel(person)
 
     override val root: Pane = borderpane {
         top(TopView::class)
@@ -23,9 +19,10 @@ class BasicView : View() {
         center = Label("Testing")
         bottom = button {
             text = "doThing"
-            action {
-                controller.doThing()
-            }
+            actionEvents()
+                    .map { Unit }
+                    .doOnNext { controller.doThing() }
+                    .subscribe {}
         }
     }
 }
@@ -36,9 +33,9 @@ class BasicController : Controller() {
     }
 }
 
-class BasicModel(name: String? = null) {
-    val nameProperty = SimpleStringProperty(this, "name", name)
-    var name by nameProperty
+class PersonModel(var person: Person) : ViewModel() {
+    val name = bind { person.nameProperty }
+    val title = bind { person.titleProperty }
 }
 
 class Person(name: String? = null, title: String? = null) {
