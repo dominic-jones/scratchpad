@@ -22,13 +22,7 @@ class BasicView : View() {
 
     override val root = BorderPane()
 
-    val jsonWriter: ObjectWriter = ObjectMapper()
-            .setMixIns(mapOf(Property::class.java to PropertyMixin::class.java))
-            .writerWithDefaultPrettyPrinter()
-
     val controller: BasicController by inject()
-    val person = Person("Riesz", 14)
-    val person2 = Person("Kevral", 10)
     val model: PersonModel by inject()
 
     init {
@@ -43,6 +37,11 @@ class BasicView : View() {
                         text = "str"
                     }
                     label(model.str)
+                    button("+") {
+                        actionEvents()
+                                .map { model.str }
+                                .subscribe { it.setValue(it.value.toLong() + 1) }
+                    }
                 }
                 hbox {
                     label {
@@ -70,35 +69,56 @@ class BasicView : View() {
 
                 model.itemProperty.bind(
                         button.actionEvents()
-                                .map { person2 }
-                                .startWith(person)
+                                // TODO 2017-07-13 Dom - Get from somewhere better
+                                .map { controller.get("Kevral") }
+                                .startWith(controller.get("Riesz"))
                                 .toBinding()
                 )
 
                 button {
                     text = "Save"
                     actionEvents()
-                            .subscribe {
-                                Paths.get("out-data")
-                                        .resolve("out.json")
-                                        .toFile()
-                                        .printWriter()
-                                        .use {
-                                            val thing = jsonWriter.writeValueAsString(model.item)
-                                            logger.info { thing }
-                                            it.println(thing)
-                                        }
-                            }
+                            .subscribe { controller.save(model) }
                 }
             }
         }
     }
+
 }
 
 @JsonIgnoreType
 abstract class PropertyMixin : Property<Any>
 
 class BasicController : Controller() {
+
+    companion object : KLogging()
+
+    val jsonWriter: ObjectWriter = ObjectMapper()
+            .setMixIns(mapOf(Property::class.java to PropertyMixin::class.java))
+            .writerWithDefaultPrettyPrinter()
+
+    val person = Person("Riesz", 14)
+    val person2 = Person("Kevral", 10)
+
+    val data = listOf(person, person2).associateBy { it.name }
+
+    fun get(name: String): Person {
+        return data[name] ?: throw RuntimeException()
+    }
+
+    fun save(model: PersonModel) {
+        model.commit()
+        Paths.get("out-data")
+                .resolve("out.json")
+                .toFile()
+                .printWriter()
+                .use {
+                    val thing = jsonWriter.writeValueAsString(model.item)
+                    logger.info { thing }
+                    it.println(thing)
+                }
+    }
+
     fun doThing() {
         println("blah")
     }
