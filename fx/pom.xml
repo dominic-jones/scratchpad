@@ -30,5 +30,17 @@
             <artifactId>rxkotlinfx</artifactId>
             <version>2.1.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.github.microutils</groupId>
+            <artifactId>kotlin-logging</artifactId>
+            <version>1.4.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+        </dependency>
     </dependencies>
 </project>

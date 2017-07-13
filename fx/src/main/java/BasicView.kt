@@ -8,9 +8,12 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
+import mu.KLogging
 import tornadofx.*
 
 class BasicView : View() {
+
+    companion object : KLogging()
 
     override val root = BorderPane()
 
@@ -20,6 +23,8 @@ class BasicView : View() {
     val model: PersonModel by inject()
 
     init {
+        logger.info { "Testing logging" }
+
         with(root) {
             top(TopView::class)
             left(LeftBar::class)
