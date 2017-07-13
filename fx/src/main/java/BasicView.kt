@@ -26,12 +26,14 @@ class BasicView : View() {
     val model: PersonModel by inject()
 
     init {
-        logger.info { "Testing logging" }
-
         with(root) {
             top(TopView::class)
             left(LeftBar::class)
             center = vbox {
+                hbox {
+                    label("name")
+                    label(model.name)
+                }
                 hbox {
                     label {
                         text = "str"
@@ -61,8 +63,6 @@ class BasicView : View() {
 
                 label.textProperty().bind(
                         button.actionEvents()
-                                .map { Unit }
-                                .doOnNext { controller.doThing() }
                                 .map { "modified" }
                                 .toBinding()
                 )
@@ -117,10 +117,6 @@ class BasicController : Controller() {
                     logger.info { thing }
                     it.println(thing)
                 }
-    }
-
-    fun doThing() {
-        println("blah")
     }
 }
 
