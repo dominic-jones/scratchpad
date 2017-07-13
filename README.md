@@ -1,6 +1,9 @@
 
 ### TornadoFX
-https://edvin.gitbooks.io/tornadofx-guide/content/11.%20Editing%20Models%20and%20Validation.html
+https://github.com/edvin/tornadofx
+
+### TornadoFX Guide
+https://thomasnield.gitbooks.io/rxjavafx-guide/
 
 ### Leveraging TornadoFx
 https://edvin.town/leveraging-tornadofx-to-the-fullest/
@@ -9,4 +12,4 @@ https://edvin.town/leveraging-tornadofx-to-the-fullest/
 https://github.com/thomasnield/RxKotlinFX
 
 ### Simple RxKotlinFx demo
-https://thomasnield.gitbooks.io/rxjavafx-guide/content/3.%20Events%20and%20Value%20Changes.html
+https://github.com/thomasnield/rxkotlinfx-tornadofx-demo
