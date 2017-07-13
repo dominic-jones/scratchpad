@@ -1,7 +1,10 @@
 import com.github.thomasnield.rxkotlinfx.actionEvents
+import com.github.thomasnield.rxkotlinfx.toBinding
+import javafx.beans.property.SimpleLongProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
@@ -9,20 +12,55 @@ import tornadofx.*
 
 class BasicView : View() {
 
-    val controller: BasicController by inject()
-    val person = Person("Tulip", "Mr")
-    val model = PersonModel(person)
+    override val root = BorderPane()
 
-    override val root: Pane = borderpane {
-        top(TopView::class)
-        left(LeftBar::class)
-        center = Label("Testing")
-        bottom = button {
-            text = "doThing"
-            actionEvents()
-                    .map { Unit }
-                    .doOnNext { controller.doThing() }
-                    .subscribe {}
+    val controller: BasicController by inject()
+    val person = Person("Riesz", 14)
+    val person2 = Person("Kevral", 10)
+    val model: PersonModel by inject()
+
+    init {
+        with(root) {
+            top(TopView::class)
+            left(LeftBar::class)
+            center = vbox {
+                hbox {
+                    label {
+                        text = "str"
+                    }
+                    label(model.str)
+                }
+                hbox {
+                    label {
+                        text = "dex"
+                    }
+                    label(model.dex)
+                }
+            }
+            bottom = hbox {
+                val button = button {
+                    text = "doThing"
+                }
+
+                val label = label {
+                    text = "initial"
+                }
+
+                label.textProperty().bind(
+                        button.actionEvents()
+                                .map { Unit }
+                                .doOnNext { controller.doThing() }
+                                .map { "modified" }
+                                .toBinding()
+                )
+
+                model.itemProperty.bind(
+                        button.actionEvents()
+                                .map { person2 }
+                                .startWith(person)
+                                .toBinding()
+                )
+            }
         }
     }
 }
@@ -33,17 +71,21 @@ class BasicController : Controller() {
     }
 }
 
-class PersonModel(var person: Person) : ViewModel() {
-    val name = bind { person.nameProperty }
-    val title = bind { person.titleProperty }
+class PersonModel : ItemViewModel<Person>() {
+    val name = bind(Person::nameProperty)
+    val str = bind(Person::strProperty)
+    val dex = bind(Person::dexProperty)
 }
 
-class Person(name: String? = null, title: String? = null) {
+class Person(name: String, str: Long) {
     val nameProperty = SimpleStringProperty(this, "name", name)
     var name by nameProperty
 
-    val titleProperty = SimpleStringProperty(this, "title", title)
-    var title by titleProperty
+    val strProperty = SimpleLongProperty(this, "str", str)
+    var str by strProperty
+
+    val dexProperty = SimpleLongProperty(this, "str", 13)
+    var dex by dexProperty
 }
 
 class TopView(override val root: Pane = StackPane()) : View() {
