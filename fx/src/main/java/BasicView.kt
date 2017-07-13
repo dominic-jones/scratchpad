@@ -1,5 +1,9 @@
+import com.fasterxml.jackson.annotation.JsonIgnoreType
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectWriter
 import com.github.thomasnield.rxkotlinfx.actionEvents
 import com.github.thomasnield.rxkotlinfx.toBinding
+import javafx.beans.property.Property
 import javafx.beans.property.SimpleLongProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.Button
@@ -10,12 +14,17 @@ import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import mu.KLogging
 import tornadofx.*
+import java.nio.file.Paths
 
 class BasicView : View() {
 
     companion object : KLogging()
 
     override val root = BorderPane()
+
+    val jsonWriter: ObjectWriter = ObjectMapper()
+            .setMixIns(mapOf(Property::class.java to PropertyMixin::class.java))
+            .writerWithDefaultPrettyPrinter()
 
     val controller: BasicController by inject()
     val person = Person("Riesz", 14)
@@ -65,10 +74,29 @@ class BasicView : View() {
                                 .startWith(person)
                                 .toBinding()
                 )
+
+                button {
+                    text = "Save"
+                    actionEvents()
+                            .subscribe {
+                                Paths.get("out-data")
+                                        .resolve("out.json")
+                                        .toFile()
+                                        .printWriter()
+                                        .use {
+                                            val thing = jsonWriter.writeValueAsString(model.item)
+                                            logger.info { thing }
+                                            it.println(thing)
+                                        }
+                            }
+                }
             }
         }
     }
 }
+
+@JsonIgnoreType
+abstract class PropertyMixin : Property<Any>
 
 class BasicController : Controller() {
     fun doThing() {
