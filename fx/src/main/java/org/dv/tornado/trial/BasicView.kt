@@ -42,20 +42,21 @@ class BasicView : View() {
                 this += find<StatFragment>(mapOf(StatFragment::name to "Dexterity", StatFragment::stat to model.dex))
             }
             bottom = hbox {
-                val button = button {
+                val btnSwap = button {
                     text = "Swap"
                 }
 
-                val label = label("initial")
-
-                label.textProperty().bind(
-                        button.actionEvents()
-                                .map { "modified" }
-                                .toBinding()
-                )
+                label {
+                    textProperty().bind(
+                            btnSwap.actionEvents()
+                                    .map { "Modified" }
+                                    .startWith("Initial")
+                                    .toBinding()
+                    )
+                }
 
                 model.itemProperty.bind(
-                        button.actionEvents()
+                        btnSwap.actionEvents()
                                 // TODO 2017-07-13 Dom - Get from somewhere better
                                 .map { controller.get("Kevral") }
                                 .startWith(controller.get("Riesz"))
