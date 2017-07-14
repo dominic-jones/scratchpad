@@ -1,3 +1,5 @@
+package org.dv.tornado.trial
+
 import com.fasterxml.jackson.annotation.JsonIgnoreType
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectWriter
