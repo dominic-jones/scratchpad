@@ -3,12 +3,14 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectWriter
 import com.github.thomasnield.rxkotlinfx.actionEvents
 import com.github.thomasnield.rxkotlinfx.toBinding
+import javafx.beans.property.LongProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleLongProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
@@ -23,7 +25,7 @@ class BasicView : View() {
     override val root = BorderPane()
 
     val controller: BasicController by inject()
-    val model: PersonModel by inject()
+    val model = PersonModel(controller.get("Riesz"))
 
     init {
         with(root) {
@@ -34,32 +36,15 @@ class BasicView : View() {
                     label("name")
                     label(model.name)
                 }
-                hbox {
-                    label {
-                        text = "str"
-                    }
-                    label(model.str)
-                    button("+") {
-                        actionEvents()
-                                .map { model.str }
-                                .subscribe { it.setValue(it.value.toLong() + 1) }
-                    }
-                }
-                hbox {
-                    label {
-                        text = "dex"
-                    }
-                    label(model.dex)
-                }
+                this += find<StatFragment>(mapOf(StatFragment::name to "Strength", StatFragment::stat to model.str))
+                this += find<StatFragment>(mapOf(StatFragment::name to "Dexterity", StatFragment::stat to model.dex))
             }
             bottom = hbox {
                 val button = button {
-                    text = "doThing"
+                    text = "Swap"
                 }
 
-                val label = label {
-                    text = "initial"
-                }
+                val label = label("initial")
 
                 label.textProperty().bind(
                         button.actionEvents()
@@ -83,7 +68,26 @@ class BasicView : View() {
             }
         }
     }
+}
 
+class StatFragment : Fragment() {
+
+    val name: String by param()
+    val stat: LongProperty by param()
+
+    override var root = HBox()
+
+    init {
+        root = hbox {
+            label(name)
+            label(stat)
+            button("+") {
+                actionEvents()
+                        .map { stat }
+                        .subscribe { it.value = it.value.toLong() + 1 }
+            }
+        }
+    }
 }
 
 @JsonIgnoreType
@@ -120,21 +124,21 @@ class BasicController : Controller() {
     }
 }
 
-class PersonModel : ItemViewModel<Person>() {
+class PersonModel(person: Person) : ItemViewModel<Person>(person) {
     val name = bind(Person::nameProperty)
     val str = bind(Person::strProperty)
-    val dex = bind(Person::dexProperty)
+    var dex = bind(Person::dexProperty)
 }
 
 class Person(name: String, str: Long) {
     val nameProperty = SimpleStringProperty(this, "name", name)
-    var name by nameProperty
+    var name: String by nameProperty
 
     val strProperty = SimpleLongProperty(this, "str", str)
-    var str by strProperty
+    var str: Long by strProperty
 
-    val dexProperty = SimpleLongProperty(this, "str", 13)
-    var dex by dexProperty
+    val dexProperty = SimpleLongProperty(this, "dex", 13)
+    var dex: Long by dexProperty
 }
 
 class TopView(override val root: Pane = StackPane()) : View() {
